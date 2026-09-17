@@ -1,0 +1,66 @@
+#!/bin/bash
+
+lvalue="$1"
+op="$2"
+rvalue="$3"
+
+# 상단 디버그 출력에 실제 연산자(op)가 나오도록 수정
+echo "lvalue    :   $lvalue"
+echo "operator  :   $op"
+echo "rvalue    :   $rvalue"
+
+case "$op" in
+
+    "endWith")
+        [[ "$lvalue" == *"$rvalue" ]]
+        ;;
+
+    "not endWith")
+        # 앞에 와일드카드(*) 추가
+        [[ "$lvalue" != *"$rvalue" ]]
+        ;;
+    
+    "startsWith")
+        [[ "$lvalue" == "$rvalue"* ]]
+        ;;
+
+    "not startsWith")
+        [[ "$lvalue" != "$rvalue"* ]]
+        ;;
+
+    "contains")
+        # lvalue에 쉼표가 포함되어 있는지 확인하고 변수를 올바르게 감쌈
+        if [[ "$lvalue" == *,* ]] ; then
+            [[ ",$lvalue," == *",$rvalue,"* ]]
+        else
+            # 실제로 포함(CONTAINS)하는지 확인하도록 != 에서 == 로 변경
+            [[ "$lvalue" == *"$rvalue"* ]]
+        fi
+        ;;
+
+    "empty")
+        [[ -z "$lvalue" ]]
+        ;;
+
+    "not empty")
+        [[ -n "$lvalue" ]]
+        ;;
+    
+    "equals"|"==")
+        [[ "$lvalue" == "$rvalue" ]]
+        ;;
+    
+    "not equals"|"!=")
+        # 누락되었던 $ 기호 추가
+        [[ "$lvalue" != "$rvalue" ]]
+        ;;
+    
+    *)
+        echo "Unknown operator: $op" >&2
+        exit 2 # 구문/설정 에러를 나타내기 위해 보통 2를 사용합니다.
+        ;;
+esac
+
+result=$?
+echo "Result    :   $result"
+exit $result
